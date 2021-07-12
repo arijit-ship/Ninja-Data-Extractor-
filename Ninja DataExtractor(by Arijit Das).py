@@ -1,11 +1,14 @@
 #Written by Arijit Das
 #July, 2021
+
+
 #Data extractor
-#Take a string in the form of a list[(touple)] as string
+#Take a string in the form of a list[(tuple)] as string
 #Parse data from it
 #Do math--avg
 #Write a spreadsheet
 #Export as xls
+#I misspelled tuple in many places... "touple"  (lol)
 
 import os
 import time
@@ -16,6 +19,8 @@ import xlsxwriter
 from colorama import init 
 from termcolor import colored 
 from colorama import Fore, Back, Style 
+
+init(convert=True)
 
 path = os.path.normpath(os.path.expanduser("~/Desktop"))
 
@@ -47,21 +52,25 @@ welcome = """
  |_| \___/|_|    |_|  |_|\__,_|___/_|\_\___|_|_| |_____/|_|_| |_| |_|\__,_|_|\__,_|\__|_|\___/|_| |_|___/ 
                                                                                                           
 """
-print(welcome)
+print(Fore.BLUE + welcome)
 
 info1 = """Use this data extractor to get the Bosons, Fermions experiments done!! Just follow the simple instructions and it will generate a spreadsheet containing energy values and number of particles, average particle-number (in .xlxs file) and a data file (.dat file, open with Notepad/Notepad++) to plot the graph."""
 
 print("\n\n")
-print("Created by Arijit Das. In July, 2021. Feedback: dasarijit1st@gmail.com\n")
+print("Created by Arijit Das, July, 2021. Version: 2.0, Feedback: dasarijit1st@gmail.com\n")
+print(Style.RESET_ALL)
+print("Repository: https://github.com/arijit-ship/Ninja-DataExtractor\n")
 print(info1)
 print("\n\n")
 print("Hit 'Ctrl+C' to terminate the operation. ")
 print("------------------------------------------------")
 print("\n\n")
 
-energyListStr = input("Enter (copy values to avoid any mistake) all the given energies in the form of a LIST i.e. [E1, E2,E3...]:   \n")
+print("Enter (copy values to avoid any mistake) all the given energies in the form of a LIST: " + Fore.MAGENTA + "[E1, E2,E3...]   \n\n")
+print(Style.RESET_ALL)
+energyListStr = input()
 print("--------------------------------------------------")
-print("\n\nEnter all the data distribution sets as a LIST OF TOUPLE i.e [(energy, no. of particles, index), (energy, no.particle, index), (energy, no.particle, index)....]:    \n")
+print("\n\nEnter all the data of particle-distribution sets in the form of ([triad, triad, triad...], temperature) where triad is a tuple of (energy, no. of particles, index).      \n")
 
 energyList = eval (energyListStr)
 noOfList = len(energyList) 
@@ -73,11 +82,14 @@ counter = 0
 try:
 
     while True:
-        disSet = input("\n\nEnter distribution list(copy values to avoid any mistake), a LIST OF TUPLE " + str(i+1) + " : [(energy, no. of particles, index),...] " + "\n(Type 'done' when you're finished): \n")
-
+        print("\n\nEnter(copy whole tuple to avoid any mistake) distribution set " + str(i+1) + ":" + Fore.MAGENTA+"  ([triad, triad, triad...], temperature) \n" +  Fore.CYAN + "(Type 'done' when you're finished): \n")
+        print(Style.RESET_ALL)
+        disSet = input()
+        
         if disSet.lower() == "done":
             break
         else:
+            disSet = str(eval(disSet)[0])
             disSet = inputStringHandeler(disSet)
             dataString = dataString + disSet + ","
             counter += 1
@@ -119,7 +131,16 @@ try:
         row += 1
 
     row = 0
-    column = 1
+    column = 1    
+    for e in energyList :
+        # write operation perform
+        worksheet.write(row, column, "--->")
+        # incrementing the value of row by one
+        # with each iteratons.
+        row += 1
+
+    row = 0
+    column = 2
     i = 0
     j = len(energyList)
     for n in particleNo:
@@ -137,12 +158,11 @@ try:
         temp = float(np.sum(arr[i]))
         avgParticleNo.append(temp/counter)
 
-    row = 0
+    row = 0 #Don not set column = 0 again.
     for avg in  avgParticleNo:
-        worksheet.write(row, counter + 1, "avg--->")
-        worksheet.write(row, counter + 1 + 1, avg)
+        worksheet.write(row, column, "avg--->")    #alternatively column --> counter + 1 + 1  
+        worksheet.write(row, column+1, avg)       # alternatively  column+1 -->counter + 1 + 1+ 1 
         row += 1
-        
     workbook.close()
 
     print("Spreadsheet completed!\n")
@@ -163,15 +183,17 @@ try:
             fp.write("\n")
 
     print("Datafile completed!\n\n")
-    print("Your Spreadsheet and Datafile are saved at Desktop. Open them and use the Datafile to plot the graph.")
-
-    print("Thanks for using this application.\n\n")
+    print("Your spreadsheet and datafile are saved to " + Fore.YELLOW + "Desktop.\n")
+    print(Style.RESET_ALL)
+    print(Fore.GREEN + "Note: You can modify/stylize the spreadsheet as needed. Use datafile(.dat open with Notepad/Notepad++) file to plot the graph.")
+    print(Style.RESET_ALL)
+    print("\nThanks for using this application.\n\n")
     countdown(59)
     time.sleep(1)
 except Exception as e:
     print(e)
     print("-----------------------------\n\n")
-    print("ERROR OCCURRED. You may want to restart the application (Hit 'Ctrl+C' to terminate)!")
+    print(Fore.RED + "ERROR OCCURRED. You may want to restart the application (Hit 'Ctrl+C' to terminate and close the app)!")
     countdown(59)
     time.sleep(1)
         
